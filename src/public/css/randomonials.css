@@ -1,0 +1,54 @@
+#randomonials-container
+{
+    display: flex;
+    flex-direction: column;
+}
+
+.randomonial:not(:last-child)
+{
+    margin-bottom: 1.5em;
+}
+
+.randomonial-comment
+{
+    text-indent: 2rem;
+    font-style: italic;
+    position: relative;
+    quotes: "\201C" "\201D" "\2018" "\2019";
+}
+
+.randomonial-comment::before {
+    top: 0.3em;
+    line-height: 0;
+    font-weight: bold;
+    position: relative;
+    font-style: normal;
+    content: open-quote;
+    font-size: xx-large;
+}
+
+.randomonial-comment::after {
+    top: 0.3em;
+    line-height: 0;
+    padding-left: 4px;
+    font-weight: bold;
+    position: relative;
+    font-style: normal;
+    font-size: xx-large;
+    content: close-quote;
+}
+
+.randomonial-author
+{
+    font-weight: bold;
+}
+
+.randomonial-location
+{
+    font-size: 0.8em;
+}
+
+.randomonial-quote-mark {
+    font-style: normal;
+    font-weight: bold;
+}

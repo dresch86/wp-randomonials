@@ -1,0 +1,240 @@
+.randomonials-vbox {
+    display: flex;
+    flex-direction: column;
+}
+
+.randomonials-hbox {
+    display: flex;
+    flex-direction: row;
+}
+
+.randomonials-notice {
+    color: red;
+    font-weight: bold;
+}
+
+.randomonial-admin-btn-cell {
+    text-align: center;
+}
+
+.randomonial-admin-btn {
+    width: 60px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 5px 10px;
+    background: rgb(0, 102, 255);
+}
+
+.randomonial-admin-btn:disabled,
+.randomonial-admin-btn[disabled],
+.randomonial-admin-btn:disabled:hover,
+.randomonial-admin-btn[disabled]:hover {
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
+
+.randomonial-admin-btn:hover {
+    background: rgb(91, 157, 255);
+}
+
+.randomonial-admin-btn > i {
+    pointer-events: none;
+}
+
+.randomonial-admin-btn-edit {
+    background: green;
+}
+
+.randomonial-admin-btn-edit:hover {
+    background: rgb(0, 177, 0);
+}
+
+.randomonial-admin-btn-del {
+    background: orange;
+}
+
+.randomonial-admin-btn-del:hover {
+    background: rgb(255, 0, 0);
+}
+
+.randomonials-custom-tag-container {
+    margin-bottom: 15px;
+    border: 1px solid #999999;
+}
+
+.randomonials-custom-tag-container:last-child {
+    margin-bottom: 10px;
+}
+
+.randomonials-tag-title {
+    padding: 5px;
+    font-weight: bold;
+    background: #cccccc;
+}
+
+.randomonial-tag-html {
+    overflow-x: auto;
+    padding: 10px 5px;
+    background: white;
+}
+
+.randomonial-tag-html > button {
+    padding: 5px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 6px;
+    background: #008bff;
+    border: 1px solid #7dbcfb;
+}
+
+.randomonial-tag-html > button:hover {
+    background: #7dbcfb;
+    border-color: #008bff;
+}
+
+.randomonial-tag-html > .randomonial-tag-html-set {
+    background: #00d900;
+    border-color: #9eee9e;
+}
+
+.randomonial-tag-html > .randomonial-tag-html-set:hover {
+    background: #009506;
+    border-color: #00d900;
+}
+
+#randomonials_dashboard {
+    display: flex;
+    padding: 30px 0;
+    max-width: 700px;
+    flex-direction: column;
+}
+
+#randomonials_admin_header {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    margin-bottom: 15px;
+}
+
+#randomonials_admin_header > h1 {
+    margin: 0;
+    font-weight: initial;
+}
+
+#randomonials_admin_header > a {
+    cursor: pointer;
+    color: #0073aa;
+    padding: 4px 8px;
+    margin-left: 5px;
+    font-weight: bold;
+    border-radius: 5px;
+    background: white;
+    text-decoration: none;
+    border: 1px solid lightgray;
+}
+
+#randomonials_admin_header > a:hover {
+    color: white;
+    background: #00a0d2;
+}
+
+#randomonials_datagrid {
+    border-collapse: collapse;
+    border: 1px solid lightgray;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+#randomonials_datagrid td, 
+#randomonials_datagrid th {
+    border: 1px solid rgb(190, 190, 190);
+}
+
+#randomonials_datagrid th:first-child {
+    padding: 5px 5px;
+}
+
+#randomonials_datagrid th:first-child > input {
+    margin: 0;
+}
+
+#randomonials_datagrid > thead {
+    color: white;
+    background: #696969;
+}
+
+#randomonials_datagrid > thead > tr > th {
+    padding: 5px 15px;
+}
+
+#randomonials_datagrid > tbody > tr > td {
+    padding: 5px;
+}
+
+#randomonials_datagrid > tbody > tr:nth-child(2n) {
+    background-color: rgb(218, 218, 218);
+}
+
+#randomonials_datagrid > tbody > tr > th {
+    background-color: #d7d9f2;
+}
+
+#randomonials_add_form label {
+    font-weight: bold;
+}
+
+#randomonials_core_inputs,
+#randomonials_custom_inputs {
+    padding: 5px;
+    background: #FFFAF0;
+    border: 1px dotted lightslategrey;
+}
+
+#randomonials_core_inputs legend,
+#randomonials_custom_inputs legend {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+#randomonials_add_controls {
+    margin-top: 10px;
+    justify-content: center;
+}
+
+#randomonials_add_controls > button {
+    width: 100px;
+    padding: 5px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 7px;
+    background: #e1e1e1;
+    border: 1px solid #adadad;
+}
+
+#randomonials_add_controls > button:hover {
+    border-color: #0073aa;
+    background: lightskyblue;
+}
+
+#randomonials_edit_tag_param {
+    display: none;
+}
+
+#randomonials_submit_result {
+    padding: 5px;
+    display: none;
+}
+
+#randomonials_submit_result.randomonial-show-result {
+    display: block;
+    font-weight: bold;
+    text-align: center;
+} 
+
+#randomonials_submit_result.randomonial-show-result.randomonial-show-result-error {
+    color: red;
+}

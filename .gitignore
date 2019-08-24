@@ -1,5 +1,6 @@
 # ---> VisualStudioCode
 .settings
+.vscode
 
 
 # ---> Windows
@@ -31,3 +32,12 @@ $RECYCLE.BIN/
 # Linux trash folder which might appear on any partition or disk
 .Trash-*
 
+# NodeJS
+node_modules/
+
+# Build directories
+build/
+dist/
+
+# Build files
+*.zip

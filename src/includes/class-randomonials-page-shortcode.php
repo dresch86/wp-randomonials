@@ -74,7 +74,13 @@ class Radomonials_Page_Shortcode {
             $HTML .= '</div>' . "\n";
         }
         else {
-            $HTML = '<div id="randomonials-container">Your feedback is very important to us, and our future customers. Please <a href="mailto:' . get_bloginfo('admin_email') . '?subject=Testimonial%20Submission%20Request">contact us</a> to be the first to share your thoughts with us about our services!</div>' . "\n";
+            $admin_email = get_bloginfo('admin_email');
+            
+            $HTML = <<<HTML 
+            <div id="randomonials-container">
+                <div id="randomonials-welcome">Your feedback is very important to us, and our future customers. Please <a href="mailto:{$admin_email}?subject=Testimonial%20Submission%20Request">contact us</a> to be the first to share your thoughts with us about our services!</div>
+            </div> 
+            HTML;
         }
 
         return $HTML;

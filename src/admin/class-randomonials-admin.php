@@ -34,8 +34,15 @@ class Randomonials_Admin {
 	 * @access   private
 	 * @var      array    $supported_ajax_operations    AJAX operations this plugin will handle.
 	 */
-	private static $supported_ajax_operations = ['get-item', 'add-item', 'create-data-file', 'edit-item', 'delete-item', 'reorder-items'];
+	private static $supported_ajax_operations = ['get-item', 'add-item', 'edit-item', 'delete-items', 'reorder-items'];
 
+	/**
+	 * Self closing tags.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      array    $selfClosing    Tags that should not have a value.
+	 */	
 	private static $selfClosing = array('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr');
 
 	/**
@@ -55,92 +62,105 @@ class Randomonials_Admin {
 		require_once RANDOMONIAL_PLUGIN_PATH . 'public/partials/randomonial_page.php';
 		$randomonial_template = json_decode($randomonial_template);
 
+		$dataInbound = json_decode(html_entity_decode(stripslashes($dataStringified)));
 		$missing_fields = [];
 		$invalid_fields = [];
-		$dataInbound = json_decode(html_entity_decode(stripslashes($dataStringified)));
+		$missing_attrs = [];
+		$invalid_attrs = [];
 		
-		foreach (array('core', 'custom') as $root_field) {
-			$root_field_children = array_keys(get_object_vars($randomonial_template->fields->{$root_field}));
+		foreach (['core', 'custom'] as $root_group) {
+			$randomonial_fields = array_keys(get_object_vars($randomonial_template->fields->{$root_group}));
 
-			foreach ($root_field_children as $root_field_child) {
-				if (property_exists($dataInbound, $root_field_child)) {
-					$sanitized = trim($dataInbound->{$root_field_child}->value);
-					$sanitized = strip_tags($sanitized);
+			foreach ($randomonial_fields as $randomonial_field) {
+				if (property_exists($dataInbound, $randomonial_field)) {
+					$template_type = &$randomonial_template->fields->{$root_group}->{$randomonial_field}->type;
+					$template_attributes = &$randomonial_template->fields->{$root_group}->{$randomonial_field}->attributes;
 	
-					if (strlen($sanitized) > 1) {
-						$dataInbound->{$root_field_child}->value = $sanitized;
+					if (!in_array($template_type, self::$selfClosing)) {
+						$sanitized = trim($dataInbound->{$randomonial_field}->value);
+						$sanitized = strip_tags($sanitized, '<br><p><em><strong><mark>');
+
+						if (strlen($sanitized) > 1) {
+							$dataInbound->{$randomonial_field}->value = $sanitized;
+						}
+						else {
+							$invalid_fields[] = $randomonial_field . ':value';
+						}
 					}
-					else {
-						$invalid_fields[] = $root_field_child . ':value';
-					}
-	
-					$template_attributes = &$randomonial_template->fields->{$root_field}->{$root_field_child}->attributes;
 	
 					if (count($template_attributes) > 0) {
-						if (property_exists($dataInbound->{$root_field_child}, 'attributes')) {
-							$dataInboundAttrs = [];
+						if (property_exists($dataInbound->{$randomonial_field}, 'attributes')) {
+							$attr_pairs_sanitized = [];
+							$attr_keys_validated = [];
 	
-							foreach ($dataInbound->{$root_field_child}->attributes as $attribute) {
+							foreach ($dataInbound->{$randomonial_field}->attributes as $attribute) {
 								$attribute_frags = explode('=', $attribute, 2);
-	
-								if (strlen($dataInboundAttrs[$attribute_frags[0]]) > 1) {
-									if (in_array($attribute_frags[0], $template_attributes)) {
-										$dataInboundAttrs[$attribute_frags[0]] = striptags(trim($attribute_frags[1]));
+
+								if (in_array($attribute_frags[0], $template_attributes)) {
+									$attribute_frags[1] = trim(strip_tags($attribute_frags[1]));
+
+									if (!empty($attribute_frags[1])) {
+										$attr_pairs_sanitized[] = $attribute_frags[0] . '=' . $attribute_frags[1];
+										$attr_keys_validated[] = $attribute_frags[0];
 									}
 									else {
-										$invalid_fields[] = $root_field_child . ':' . $attribute_frags[0];
+										$invalid_attrs[] = $randomonial_field . ':' . $attribute_frags[0];
 									}
 								}
 								else {
-									$invalid_fields[] = $root_field_child . ':' . $attribute_frags[0];
+									$invalid_attrs[] = $randomonial_field . ':' . $attribute_frags[0];
 								}
 							}
 	
-							$missing_attrs = array_diff($template_attributes, array_keys($dataInboundAttrs));
+							$attrs_missing_result = array_diff($template_attributes, $attr_keys_validated);
 	
-							if (count($missing_attrs) > 0) {
-								foreach ($missing_attrs as $missing_attr) {
-									$missing_fields[] = $root_field_child . ':' . $missing_attr;
+							if (count($attrs_missing_result) == 0) {
+								$dataInbound->{$randomonial_field}->attributes = $attr_pairs_sanitized;
+							}
+							else {
+								foreach ($attrs_missing_result as $attr_missing_result) {
+									$missing_attrs[] = $randomonial_field . ':' . $attr_missing_result;
 								}
 							}
 						}
 						else {
 							foreach ($template_attributes as $attribute) {
-								$missing_fields[] = $root_field_child . ':' . $attribute;
+								$missing_attrs[] = $randomonial_field . ':' . $attribute;
 							}
 						}
 					}
 					else {
-						if (count($dataInbound->{$root_field_child}->attributes) > 0) {
-							foreach ($dataInbound->{$root_field_child}->attributes as $attribute) {
+						if (property_exists($dataInbound->{$randomonial_field}, 'attributes')) {
+							foreach ($dataInbound->{$randomonial_field}->attributes as $attribute) {
 								$bad_attr_frags = explode('=', $attribute, 2);
-								$invalid_fields[] = $root_field_child . ':' . $bad_attr_frags[0];
+								$invalid_attrs[] = $randomonial_field . ':' . $bad_attr_frags[0];
 							}
 						}
 					}
 				}
 				else {
-					$missing_fields[] = $root_field_child;
+					$missing_fields[] = $randomonial_field;
 				}
 			}
 		}
 
-		return array('SANITIZED'=>$dataInbound, 'MISSING'=>$missing_fields, 'INVALID'=>$invalid_fields);
+		$has_erroneous = !empty($missing_fields) || !empty($missing_attrs) || !empty($invalid_fields) || !empty($invalid_attrs);
+		
+		if (!$has_erroneous) {
+			return $dataInbound;
+		}
+		else {
+			return ['MISSING'=>['FIELDS'=>$missing_fields, 'ATTRIBUTES'=>$missing_attrs], 
+					'INVALID'=>['FIELDS'=>$invalid_fields, 'ATTRIBUTES'=>$invalid_attrs]];
+		}
 	}
 
 	private function get_randomonial($itemId) {
 		$json_data_file = RANDOMONIAL_DATA_PATH . 'blog_id_' . get_current_blog_id() . '.json';
 
 		if (file_exists($json_data_file)) {
-			// Sets $randomonial_template using NOWDOC
-			require_once RANDOMONIAL_PLUGIN_PATH . 'public/partials/randomonial_page.php';
-			$randomonial_template = json_decode($randomonial_template);
-			$randomonial_template_merged = array_merge(get_object_vars($randomonial_template->fields->core), get_object_vars($randomonial_template->fields->custom));;
-
 			$testimonialJSON = json_decode(file_get_contents($json_data_file));
-			$payload = ['TEMPLATE'=>$randomonial_template_merged, 'RANDOMONIAL'=>$testimonialJSON->entries[$itemId]];
-			
-			return json_encode(array(200, $payload));
+			return json_encode(array(200, $testimonialJSON->entries[$itemId]));
 		}
 		else {
 			return json_encode(array(500, 'Internal Application Error'));
@@ -154,9 +174,9 @@ class Randomonials_Admin {
 			if (current_user_can('publish_posts')) {
 				$result = $this->validate_randomonial($fieldsSubmittedJSON);
 
-				if ((count($result['MISSING']) == 0) && (count($result['INVALID']) == 0)) {
+				if (is_object($result)) {
 					$testimonialDataJSON = json_decode(file_get_contents($json_data_file));
-					$testimonialDataJSON->entries[] = $result['SANITIZED'];
+					$testimonialDataJSON->entries[] = $result;
 					$testimonialDataJSON->entries = array_values($testimonialDataJSON->entries);
 				
 					if (file_put_contents($json_data_file, json_encode($testimonialDataJSON, JSON_NUMERIC_CHECK)) > 0) {
@@ -167,7 +187,7 @@ class Randomonials_Admin {
 					}
 				}
 				else {
-					return json_encode(array(400, array('MISSING'=>$result['MISSING'], 'INVALID'=>$result['INVALID'])));
+					return json_encode(array(400, $result));
 				}
 			}
 			else {
@@ -179,17 +199,56 @@ class Randomonials_Admin {
 		}
 	}
 
-	private function delete_randomonial($idx) {
+	private function edit_randomonial($item_id, $updated_data) {
+		$json_data_file = RANDOMONIAL_DATA_PATH . 'blog_id_' . get_current_blog_id() . '.json';
+
+		if (file_exists($json_data_file)) {
+			if (current_user_can('edit_posts')) {
+				$result = $this->validate_randomonial($updated_data);
+
+				if (is_object($result)) {
+					$testimonialDataJSON = json_decode(file_get_contents($json_data_file));
+					$testimonialDataJSON->entries[$item_id] = $result;
+					$testimonialDataJSON->entries = array_values($testimonialDataJSON->entries);
+				
+					if (file_put_contents($json_data_file, json_encode($testimonialDataJSON, JSON_NUMERIC_CHECK)) > 0) {
+						return json_encode(array(200, 'OK'));
+					}
+					else {
+						return json_encode(array(500, 'System Write Failed'));
+					}
+				}
+				else {
+					return json_encode(array(400, $result));
+				}
+			}
+			else {
+				return json_encode(array(403, 'Forbidden'));
+			}
+		}
+		else {
+			return json_encode(array(500, 'Internal Application Error'));
+		}
+	}
+
+	private function delete_randomonials($indexes) {
 		$json_data_file = RANDOMONIAL_DATA_PATH . 'blog_id_' . get_current_blog_id() . '.json';
 
 		if (file_exists($json_data_file)) {
 			if (current_user_can('delete_others_posts')) {
 				$testimonialJSON = json_decode(file_get_contents($json_data_file));
-				unset($testimonialJSON->entries[$idx]); 
+				$starting_entry_count = count($testimonialJSON->entries);
+				$entries_to_delete = json_decode(html_entity_decode(stripslashes($indexes)));
+
+				foreach ($entries_to_delete as $entry_id) {
+					unset($testimonialJSON->entries[$entry_id]);
+				}
+				 
 				$testimonialJSON->entries = array_values($testimonialJSON->entries);
+				$final_entry_count = count($testimonialJSON->entries);
 				
 				if (file_put_contents($json_data_file, json_encode($testimonialJSON, JSON_NUMERIC_CHECK)) > 0) {
-					return json_encode(array(200, 'OK'));
+					return json_encode(array(200, ($starting_entry_count - $final_entry_count)));
 				}
 				else {
 					return json_encode(array(500, 'System Write Failed'));
@@ -204,7 +263,57 @@ class Randomonials_Admin {
 		}
 	}
 
-	private function echo_randomonial_html_rows($randomonial_count, $jsonData) {
+	private function build_randomonials_data_form() {
+        // Sets $randomonial_template using NOWDOC
+        require_once RANDOMONIAL_PLUGIN_PATH . 'public/partials/randomonial_page.php';
+		$randomonial_template = json_decode($randomonial_template);
+		
+		$custom_fields = array_keys(get_object_vars($randomonial_template->fields->custom));
+		$custom_fields_html = '';
+
+		if (count($custom_fields) > 0) {
+			$custom_fields_html .= '    <fieldset id="randomonials_custom_fields">' . "\n";
+			$custom_fields_html .= '        <legend>Custom HTML Fields</legend>' . "\n";
+
+			foreach ($custom_fields as $field) {
+				$custom_fields_html .= '        <div class="randomonials-custom-tag-container">' . "\n";
+				$custom_fields_html .= '            <div class="randomonials-tag-title">' . ucwords($field) . ' Field</div>' . "\n";
+				
+				$tag_object = &$randomonial_template->fields->custom->{$field};
+				$tagAttributeInputs = [];
+
+				foreach ($tag_object->attributes as $attribute) {
+					$tagAttributeInputs[] = '<span class="randomonial-attribute-label">' . $attribute . '="</span><button type="button" data-field-param="' . $attribute . '">Set</button><span class="randomonial-attribute-label">"</span>';
+				}
+
+				if (count($tagAttributeInputs) > 0) {
+					$tagAttributeInputs = ' ' . implode(' ', $tagAttributeInputs);
+				}
+				else {
+					$tagAttributeInputs = '';
+				}
+
+				if (in_array($tag_object->type, self::$selfClosing)) {
+					$custom_fields_html .= '            <div class="randomonial-tag-html" data-field-name="' . $field . '"><span>' . '&lt;' . $tag_object->type . ' class="' . $tag_object->class . '"</span>' . $tagAttributeInputs . '<span>&gt;</span></div>' . "\n";
+				}
+				else {
+					$custom_fields_html .= '            <div class="randomonial-tag-html" data-field-name="' . $field . '"><span>&lt;' . $tag_object->type . ' class="' . $tag_object->class . '"</span>' . $tagAttributeInputs . '<span>&gt;</span><button type="button" data-field-param="value">Set</button><span>&lt;/' . $tag_object->type . '&gt;</span></div>' . "\n"; 
+				}
+
+				$custom_fields_html .= '        </div>' . "\n";
+			}
+
+			$custom_fields_html .= '    </fieldset>' . "\n";
+		}
+
+		// Sets $randomonial_data_form using HEREDOC
+		require_once RANDOMONIAL_PLUGIN_PATH . 'admin/partials/randomonial-data-form.php';
+		return $randomonial_data_form;
+	}
+
+	private function build_randomonial_html_rows($randomonial_count, $jsonData) {
+		$html = '';
+
 		foreach ($jsonData->entries as $idxPos => $randomonial) {
 			$author_out = ((strlen($randomonial->author->value) > 22) ? (substr($randomonial->author->value, 0, 19) . '...') : $randomonial->author->value);
 			$comment_out = ((strlen($randomonial->comment->value) > 35) ? (substr($randomonial->comment->value, 0, 32) . '...') : $randomonial->comment->value);
@@ -223,16 +332,18 @@ class Randomonials_Admin {
 				$down_disabled = '';
 			}
 
-			echo '            <tr data-randomonial-id="' . $idxPos . '">' . "\n";
-			echo '                <th><input type="checkbox" name="randomonials_selected[]" value="' . $idxPos . '"></th>' . "\n";
-			echo '                <td>' . $author_out . '</td>' . "\n";
-			echo '                <td>' . $comment_out . '</td>' . "\n";
-			echo '                <td class="randomonial-admin-btn-cell"><button type="button" class="randomonial-admin-btn randomonial-admin-btn-edit"><i class="icofont-gear icofont-lg"></i></button></td>' . "\n";
-			echo '                <td class="randomonial-admin-btn-cell"><button type="button" class="randomonial-admin-btn"' . $up_disabled . '><i class="icofont-rounded-up icofont-lg"></i></button></td>' . "\n";
-			echo '                <td class="randomonial-admin-btn-cell"><button type="button" class="randomonial-admin-btn"' . $down_disabled . '><i class="icofont-rounded-down icofont-lg"></i></button></td>' . "\n";
-			echo '                <td class="randomonial-admin-btn-cell"><button type="button" class="randomonial-admin-btn randomonial-admin-btn-del" data-nonce="' . wp_create_nonce('delete-item') . '" onclick="deleteRandomonial(this);"><i class="icofont-close-circled icofont-lg"></i></button></td>' . "\n";
-			echo '            </tr>' . "\n";			
+			$html .= '<tr data-randomonial-id="' . $idxPos . '">' . "\n";
+			$html .= '    <th><input type="checkbox" name="randomonials_selected[]" value="' . $idxPos . '"></th>' . "\n";
+			$html .= '    <td>' . $author_out . '</td>' . "\n";
+			$html .= '    <td>' . $comment_out . '</td>' . "\n";
+			$html .= '    <td class="randomonial-admin-btn-cell"><button type="button" class="randomonial-admin-btn randomonial-admin-btn-edit"><i class="icofont-gear icofont-lg"></i></button></td>' . "\n";
+			$html .= '    <td class="randomonial-admin-btn-cell"><button type="button" class="randomonial-admin-btn randomonial-admin-btn-up"' . $up_disabled . '><i class="icofont-rounded-up icofont-lg"></i></button></td>' . "\n";
+			$html .= '    <td class="randomonial-admin-btn-cell"><button type="button" class="randomonial-admin-btn randomonial-admin-btn-down"' . $down_disabled . '><i class="icofont-rounded-down icofont-lg"></i></button></td>' . "\n";
+			$html .= '    <td class="randomonial-admin-btn-cell"><button type="button" class="randomonial-admin-btn randomonial-admin-btn-del"><i class="icofont-close-circled icofont-lg"></i></button></td>' . "\n";
+			$html .= '</tr>' . "\n";			
 		}
+
+		return $html;
 	}
 
 	public function auto_delete_data_file($old_site) {
@@ -253,126 +364,38 @@ class Randomonials_Admin {
 		}
 	}
 
-	public function display_randomonials_add_form() {
-        // Sets $randomonial_template using NOWDOC
-        require_once RANDOMONIAL_PLUGIN_PATH . 'public/partials/randomonial_page.php';
-		$randomonial_template = json_decode($randomonial_template);
-		
-		echo '<div id="randomonials_dashboard">' . "\n";
-		echo '    <div id="randomonials_admin_header">' . "\n";
-		echo '        <h1>Adding New Randomonial...</h1>' . "\n";
-		echo '    </div>'  . "\n";
-		echo '    <form id="randomonials_add_form" data-nonce="' . wp_create_nonce('add-item') . '" class="randomonials-vbox" method="post">' . "\n";
-		echo '        <fieldset id="randomonials_core_inputs">' . "\n";
-		echo '            <legend>Core Fields</legend>' . "\n";
-		echo '            <div class="randomonials-vbox">' . "\n";
-		echo '                <label for="randmonial_author_ipt">Author:</label>' . "\n";
-		echo '                <input type="text" id="randmonial_author_ipt" name="author" minlength="1" maxlength="100" placeholder="Author goes here..." required>' . "\n";
-		echo '                <label for="randmonial_comment_ipt">Comment:</label>' . "\n";
-		echo '                <textarea id="randmonial_comment_ipt" name="comment" rows="10" cols="60" placeholder="Comment goes here..." required></textarea>' . "\n";
-		echo '            </div>'  . "\n";
-		echo '        </fieldset>' . "\n";
-
-		$custom_fields = array_keys(get_object_vars($randomonial_template->fields->custom));
-
-		if (count($custom_fields) > 0) {
-			echo '        <fieldset id="randomonials_custom_inputs">' . "\n";
-			echo '            <legend>Custom HTML Fields</legend>' . "\n";
-
-			foreach ($custom_fields as $field) {
-				echo '            <div class="randomonials-custom-tag-container">' . "\n";
-				echo '                <div class="randomonials-tag-title">' . ucwords($field) . ' Field</div>' . "\n";
-				
-				$tag_object = &$randomonial_template->fields->custom->{$field};
-				$tagAttributeInputs = [];
-
-				foreach ($tag_object->attributes as $attribute) {
-					$tagAttributeInputs[] = '<span class="randomonial-attribute-label">' . $attribute . '="</span><button type="button" data-field-param="' . $attribute . '" onclick="set_tag_param(this);">Set</button><span class="randomonial-attribute-label">"</span>';
-				}
-
-				if (count($tagAttributeInputs) > 0) {
-					$tagAttributeInputs = ' ' . implode(' ', $tagAttributeInputs);
-				}
-				else {
-					$tagAttributeInputs = '';
-				}
-
-				if (in_array($tag_object->type, self::$selfClosing)) {
-					echo '                <div class="randomonial-tag-html" data-field-name="' . $field . '"><span>' . '&lt;' . $tag_object->type . ' class="' . $tag_object->class . '"</span>' . $tagAttributeInputs . '<span>&gt;</span></div>' . "\n";
-				}
-				else {
-					echo '                <div class="randomonial-tag-html" data-field-name="' . $field . '"><span>&lt;' . $tag_object->type . ' class="' . $tag_object->class . '"</span>' . $tagAttributeInputs . '<span>&gt;</span><button type="button" data-field-param="value" onclick="set_tag_param(this);">Set</button><span>&lt;/' . $tag_object->type . '&gt;</span></div>' . "\n"; 
-				}
-
-				echo '            </div>' . "\n";
-			}
-
-			echo '        </fieldset>' . "\n";
-		}
-
-		echo '        <div id="randomonials_add_controls" class="randomonials-hbox">' . "\n";
-		echo '            <button type="submit">Submit</button>' . "\n";
-		echo '            <button type="reset" onclick="reset_form();">Reset</button>' . "\n";
-		echo '        </div>'  . "\n";
-		echo '    </form>' . "\n";
-		echo '    <div id="randomonials_submit_result">' . "\n";
-		echo '    </div>' . "\n";
-		echo '    <div id="randomonials_edit_tag_param">' . "\n";
-		echo '        <input type=text id="randomonial_param_input" placeholder="Please enter value here...">' . "\n";
-		echo '    </div>' . "\n";
-		echo '</div>'  . "\n";
-
-		// Sets $randomonial_data_form using HEREDOC
-		require_once RANDOMONIAL_PLUGIN_PATH . 'admin/partials/randomonial-data-form.php';
-	}
-
-	public function display_randomonials_table() {
+	public function display_randomonials_controls() {
 		if (!current_user_can('edit_others_pages')) {
 		  wp_die(__('You do not have sufficient permissions to access this page!'));
 		}
 
 		$testimonialJSON = RANDOMONIAL_DATA_PATH . 'blog_id_' . get_current_blog_id() . '.json';
-		
-		echo '<div id="randomonials_dashboard">' . "\n";
-		echo '<div id="randomonials_admin_header">' . "\n";
-		echo '    <h1>Manage Randomonials</h1>' . "\n";
 
 		if (file_exists($testimonialJSON)) {
-			echo '    <a class="page-title-action aria-button-if-js" href="' . menu_page_url('randomonials-add', false) . '">Add New</a>' . "\n";
-			echo '</div>' . "\n";
-
+			$header_button = '<button id="randomonials_add_button" type="button">Add New</button>';
 			$testimonialJSON = json_decode(file_get_contents($testimonialJSON));
 			$randomonial_count = count($testimonialJSON->entries);
 
 			if ($randomonial_count > 0) {
-				echo '    <table id="randomonials_datagrid">' . "\n";
-				echo '        <thead>' . "\n";
-				echo '            <tr>' . "\n";
-				echo '                <th><input type="checkbox" id="randomonials_select_all" onclick="selectAllRandomonials(this);"></th>' . "\n";
-				echo '                <th>Author</th>' . "\n";
-				echo '                <th>Comment</th>' . "\n";
-				echo '                <th>Edit</th>' . "\n";
-				echo '                <th colspan="2">Move</th>' . "\n";
-				echo '                <th>Delete</th>' . "\n";
-				echo '            </tr>' . "\n";
-				echo '        </thead>' . "\n";
-				echo '        <tbody>' . "\n";
-	
-				$this->echo_randomonial_html_rows($randomonial_count, $testimonialJSON);
-	
-				echo '        </tbody>' . "\n";
-				echo '    </table>' . "\n";
+				$randomonial_controls = $this->build_randomonial_html_rows($randomonial_count, $testimonialJSON);
+
+				// Sets $randomonials_control_grid var using HEREDOC
+				require_once RANDOMONIAL_PLUGIN_PATH . 'admin/partials/randomonials-control-grid.php';
+				$dashboard_output = &$randomonials_control_grid;
 			}
 			else {
-				echo '    <div class="randomonials-notice">Your site doesn\'t have any randomonials yet. Use the "Add New" button link above to add your first one!</div>' . "\n";
+				$dashboard_output = '<div class="randomonials-notice">Your site doesn\'t have any randomonials yet. Use the "Add New" button link above to add your first one!</div>';
 			}
         }
         else {
-			echo '</div>' . "\n";
-            echo '    <div class="randomonials-notice">Your site does not have a Randomonials data file! Please deactivate / reactivate the plugin to create one! Deactivating the plugin will <strong>NOT</strong> delete other data files that exist.</div>' . "\n";
+			$header_button = '';
+            $dashboard_output = '<div class="randomonials-notice">Your site does not have a Randomonials data file! Please deactivate / reactivate the plugin to create one! Deactivating the plugin will <strong>NOT</strong> delete other data files that exist.</div>';
 		}
-		
-		echo '</div>' . "\n";
+
+		// Sets $randomonials_dashboard var using HEREDOC
+		require_once RANDOMONIAL_PLUGIN_PATH . 'admin/partials/randomonials-dashboard.php';
+		echo $randomonials_dashboard;		
+		echo $this->build_randomonials_data_form();
 	}
 
 	/**
@@ -396,11 +419,11 @@ class Randomonials_Admin {
 					case 'add-item':
 						echo $this->add_randomonial($_POST['fields']);
 						break;
-					case 'delete-item':
-						echo $this->delete_randomonial($_POST['itemId']);
+					case 'delete-items':
+						echo $this->delete_randomonials($_POST['items']);
 						break;
-					case 'delete-multi-items':
-						echo $this->delete_randomonial($_POST['itemIds']);
+					case 'edit-item':
+						echo $this->edit_randomonial($_POST['itemId'], $_POST['fields']);
 						break;
 					default:
 						echo json_encode(array(400, 'Bad Request'));
@@ -466,17 +489,14 @@ class Randomonials_Admin {
 
 		switch ($hook)
 		{
-			case 'toplevel_page_randomonials-manager':
-				$localize_js = ['ajax_url' => admin_url('admin-ajax.php'), 
+			case 'plugins_page_randomonials-manager':
+				$localize_js = ['ajax_url' => admin_url('admin-ajax.php'),
+								'nonce_add_item' => wp_create_nonce('add-item'), 
 								'nonce_get_item' => wp_create_nonce('get-item'),
-								'nonce_edit_item' => wp_create_nonce('edit-item')];
-				wp_enqueue_script($this->plugin_name . '-edit-form-builder', (RANDOMONIAL_PLUGIN_URL . 'admin/js/randomonials-edit-form-builder.js'), array('wp-tinymce'), $this->version, false);
-				wp_enqueue_script($this->plugin_name . '-admin-manage', (RANDOMONIAL_PLUGIN_URL . 'admin/js/randomonials-admin-manage.js'), array('jquery', 'jquery-ui-dialog'), $this->version, false);
-				wp_localize_script($this->plugin_name . '-admin-manage', 'randomonial_admin_client', $localize_js);
-				break;
-			case 'randomonials_page_randomonials-add':
-				wp_enqueue_script($this->plugin_name . '-admin-add', (RANDOMONIAL_PLUGIN_URL . 'admin/js/randomonials-admin-add.js'), array('jquery', 'jquery-ui-dialog'), $this->version, false);
-				wp_localize_script($this->plugin_name . '-admin-add', 'randomonial_admin_client', array('ajax_url' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('ajax-add')));
+								'nonce_edit_item' => wp_create_nonce('edit-item'),
+								'nonce_delete_items' => wp_create_nonce('delete-items')];
+				wp_enqueue_script($this->plugin_name . '-admin-controller', (RANDOMONIAL_PLUGIN_URL . 'admin/js/randomonials-admin-controller.js'), array('jquery', 'jquery-ui-dialog', 'wp-tinymce'), $this->version, false);
+				wp_localize_script($this->plugin_name . '-admin-controller', 'randomonial_admin_client', $localize_js);
 				break;
 			default:
 				break;
@@ -489,8 +509,6 @@ class Randomonials_Admin {
 	 * @since    1.0.0
 	 */
 	public function add_admin_menus() {
-		add_menu_page('Randomonials Manager', 'Randomonials', 'edit_others_pages', 'randomonials-manager', array($this, 'display_randomonials_table'), 'dashicons-media-code', 5);
-		add_submenu_page('randomonials-manager', 'Randomonials Dashboard', 'Manage', 'edit_others_pages', 'randomonials-manager', array($this, 'display_randomonials_table'));
-		add_submenu_page('randomonials-manager', 'New Randomonial', 'Add New', 'publish_pages', 'randomonials-add', array($this, 'display_randomonials_add_form'));
+		add_submenu_page('plugins.php', 'Randomonials Manager', 'Randomonials', 'manage_options', 'randomonials-manager', array($this, 'display_randomonials_controls'));
 	}
 }

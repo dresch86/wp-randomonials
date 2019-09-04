@@ -24,7 +24,7 @@ $randomonial_template = <<<'JSON'
             {
                 "type":"div",
                 "class":"randomonial-location",
-                "attributes":[]
+                "attributes":["src", "att"]
             }
         }
     },

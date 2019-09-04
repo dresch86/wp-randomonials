@@ -10,7 +10,7 @@
             "location":
             {
                 "value":"Tampa, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -27,7 +27,7 @@
             "location":
             {
                 "value":"Fort Lauderdale, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -44,7 +44,7 @@
             "location":
             {
                 "value":"Fort Lauderdale, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -61,7 +61,7 @@
             "location":
             {
                 "value":"Fort Lauderdale, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -78,7 +78,7 @@
             "location":
             {
                 "value":"Fort Lauderdale, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -95,7 +95,7 @@
             "location":
             {
                 "value":"St. Petersburg, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -112,7 +112,7 @@
             "location":
             {
                 "value":"Tampa, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -129,7 +129,7 @@
             "location":
             {
                 "value":"Tampa, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -146,7 +146,7 @@
             "location":
             {
                 "value":"Fort Lauderdale, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -163,7 +163,7 @@
             "location":
             {
                 "value":"Tampa, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -180,7 +180,7 @@
             "location":
             {
                 "value":"Tampa, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -197,7 +197,7 @@
             "location":
             {
                 "value":"Tampa, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -214,7 +214,7 @@
             "location":
             {
                 "value":"Michigan",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -231,7 +231,7 @@
             "location":
             {
                 "value":"Tampa, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -248,7 +248,7 @@
             "location":
             {
                 "value":"Tampa, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -265,7 +265,7 @@
             "location":
             {
                 "value":"Tampa, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {
@@ -282,7 +282,7 @@
             "location":
             {
                 "value":"Tampa, FL",
-                "attributes":[]
+                "attributes":["src=http://www.example.com/image.jpg", "att=val"]
             },
             "comment":
             {

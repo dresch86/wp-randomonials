@@ -13,6 +13,21 @@
     font-weight: bold;
 }
 
+.randomonials_bulk_action_apply {
+    color: #555;
+    cursor: pointer;
+    border-radius: 5px;
+    background: #f7f7f7;
+    border: 1px solid #ccc;
+    box-shadow: 0 1px 0 #ccc;
+}
+
+.randomonials_bulk_action_apply:hover {
+    color: #23282d;
+    border-color: #999;
+    background: #fafafa;
+}
+
 .randomonial-admin-btn-cell {
     text-align: center;
 }
@@ -116,7 +131,7 @@
     display: flex;
     align-items: center;
     flex-direction: row;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 #randomonials_admin_header > h1 {
@@ -141,71 +156,104 @@
     background: #00a0d2;
 }
 
-#randomonials_datagrid {
+#randomonials_add_button {
+    cursor: pointer;
+    padding: 4px 8px;
+    color: #0073aa;
+    margin-left: 5px;
+    font-weight: bold;
+    border-radius: 3px;
+    background: #f7f7f7;
+    border: 1px solid #ccc;
+}
+
+#randomonials_add_button:hover {
+    color: white;
+    background: #00a0d2;
+    border-color: #008ec2;
+}
+
+#randomonials_bulk_action_top {
+    padding-bottom: 5px;
+}
+
+#randomonials_bulk_action_bottom {
+    padding-top: 5px;
+}
+
+#randomonials_control_grid {
     border-collapse: collapse;
     border: 1px solid lightgray;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 }
 
-#randomonials_datagrid td, 
-#randomonials_datagrid th {
+#randomonials_control_grid td, 
+#randomonials_control_grid th {
     border: 1px solid rgb(190, 190, 190);
 }
 
-#randomonials_datagrid th:first-child {
+#randomonials_control_grid th:first-child {
     padding: 5px 5px;
 }
 
-#randomonials_datagrid th:first-child > input {
+#randomonials_control_grid th:first-child > input {
     margin: 0;
 }
 
-#randomonials_datagrid > thead {
+#randomonials_control_grid > thead {
     color: white;
     background: #696969;
 }
 
-#randomonials_datagrid > thead > tr > th {
+#randomonials_control_grid > thead > tr > th {
     padding: 5px 15px;
 }
 
-#randomonials_datagrid > tbody > tr > td {
+#randomonials_control_grid > tbody > tr > td {
     padding: 5px;
 }
 
-#randomonials_datagrid > tbody > tr:nth-child(2n) {
+#randomonials_control_grid > tbody > tr:nth-child(2n) {
     background-color: rgb(218, 218, 218);
 }
 
-#randomonials_datagrid > tbody > tr > th {
+#randomonials_control_grid > tbody > tr > th {
     background-color: #d7d9f2;
 }
 
-#randomonials_add_form label {
+#randomonials_action_result {
+    display: none;
+}
+
+#randomonials_data_form {
+    display: none;
+}
+
+#randomonials_data_form label {
     font-weight: bold;
 }
 
-#randomonials_core_inputs,
-#randomonials_custom_inputs {
+#randomonials_core_fields,
+#randomonials_custom_fields {
     padding: 5px;
     background: #FFFAF0;
     border: 1px dotted lightslategrey;
 }
 
-#randomonials_core_inputs legend,
-#randomonials_custom_inputs legend {
+#randomonials_core_fields legend,
+#randomonials_custom_fields legend {
     font-size: 1.2em;
     font-weight: bold;
     margin-left: 10px;
 }
 
-#randomonials_add_controls {
+#randomonials_data_controls {
     margin-top: 10px;
     justify-content: center;
 }
 
-#randomonials_add_controls > button {
+#randomonials_data_controls > button {
     width: 100px;
     padding: 5px;
     margin: 0 5px;
@@ -215,7 +263,7 @@
     border: 1px solid #adadad;
 }
 
-#randomonials_add_controls > button:hover {
+#randomonials_data_controls > button:hover {
     border-color: #0073aa;
     background: lightskyblue;
 }

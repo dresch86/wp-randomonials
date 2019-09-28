@@ -1,5 +1,21 @@
 <?php
 /**
+ * Randomonials is a plugin for WordPress that manages and displays
+ * testimonials in a randomized order.
+ * Copyright (C) 2019 by Daniel Resch
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * 
  * The admin-specific functionality of the plugin.
  *
  * Defines the plugin name, version, and two examples hooks for how to
@@ -7,7 +23,7 @@
  *
  * @package    Randomonials
  * @subpackage Randomonials/public
- * @author     Daniel Resch <dresch@primesoftwarenetworks.com>
+ * @author     Daniel Resch <primesoftwarenetworks@gmail.com>
  */
 class Randomonials_Admin {
 	/**
@@ -152,6 +168,46 @@ class Randomonials_Admin {
 		else {
 			return ['MISSING'=>['FIELDS'=>$missing_fields, 'ATTRIBUTES'=>$missing_attrs], 
 					'INVALID'=>['FIELDS'=>$invalid_fields, 'ATTRIBUTES'=>$invalid_attrs]];
+		}
+	}
+
+	private function reorder_randomonials($itemId, $direction) {
+		$direction = (int) $direction;
+		$itemId = (int) $itemId;
+
+		if (is_integer($itemId) && is_integer($direction)) {
+			$json_data_file = RANDOMONIAL_DATA_PATH . 'blog_id_' . get_current_blog_id() . '.json';
+
+			if (file_exists($json_data_file)) {
+				if (current_user_can('edit_posts')) {
+					$testimonialDataJSON = json_decode(file_get_contents($json_data_file));
+					$newId = $itemId + $direction;
+
+					if ($newId >= 0) {
+						if ($newId < count($testimonialDataJSON->entries)) {
+							$tempSelected = $testimonialDataJSON->entries[$itemId];
+							$testimonialDataJSON->entries[$itemId] = $testimonialDataJSON->entries[$newId];
+							$testimonialDataJSON->entries[$newId] = $tempSelected;
+		
+							if (file_put_contents($json_data_file, json_encode($testimonialDataJSON, JSON_NUMERIC_CHECK)) > 0) {
+								return json_encode(array(200, 'OK'));
+							} else {
+								return json_encode(array(500, 'System Write Failed'));
+							}
+						} else {
+							return json_encode(array(400, 'Randomonial outside of upper limit!'));
+						}
+					} else {
+						return json_encode(array(400, 'Randomonial outside of lower limit!'));
+					}
+				} else {
+					return json_encode(array(403, 'Insufficient Permissions'));
+				}
+			} else {
+				return json_encode(array(500, 'Internal Application Error'));
+			}
+		} else {
+			return json_encode(array(400, 'Invalid randomonial id or movement!'));
 		}
 	}
 
@@ -425,6 +481,9 @@ class Randomonials_Admin {
 					case 'edit-item':
 						echo $this->edit_randomonial($_POST['itemId'], $_POST['fields']);
 						break;
+					case 'reorder-items':
+						echo $this->reorder_randomonials($_POST['itemId'], $_POST['direction']);
+						break;
 					default:
 						echo json_encode(array(400, 'Bad Request'));
 						break;
@@ -475,18 +534,6 @@ class Randomonials_Admin {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts($hook) {
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Plugin_Name_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Plugin_Name_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		switch ($hook)
 		{
 			case 'plugins_page_randomonials-manager':
@@ -494,7 +541,8 @@ class Randomonials_Admin {
 								'nonce_add_item' => wp_create_nonce('add-item'), 
 								'nonce_get_item' => wp_create_nonce('get-item'),
 								'nonce_edit_item' => wp_create_nonce('edit-item'),
-								'nonce_delete_items' => wp_create_nonce('delete-items')];
+								'nonce_delete_items' => wp_create_nonce('delete-items'),
+								'nonce_reorder_items' => wp_create_nonce('reorder-items')];
 				wp_enqueue_script($this->plugin_name . '-admin-controller', (RANDOMONIAL_PLUGIN_URL . 'admin/js/randomonials-admin-controller.js'), array('jquery', 'jquery-ui-dialog', 'wp-tinymce'), $this->version, false);
 				wp_localize_script($this->plugin_name . '-admin-controller', 'randomonial_admin_client', $localize_js);
 				break;

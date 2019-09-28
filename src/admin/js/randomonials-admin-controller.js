@@ -60,16 +60,45 @@ RandomonialAdminController.prototype.dataGridControlRouter = function(event) {
 
     if (event.target.classList.contains('randomonial-admin-btn-edit')) {
         this.showEditForm(event);
-    } else if (event.target.classList.contains('randomonial-admin-btn-up')) {
-        console.log('Moving up functionality not yet implemented.');
-    } else if (event.target.classList.contains('randomonial-admin-btn-down')) {
-        console.log('Moving down functionality not yet implemented.');
+    } else if (event.target.classList.contains('randomonial-admin-btn-up') && (event.target.disabled == false)) {
+        this.handleReorderButton(event, -1);
+    } else if (event.target.classList.contains('randomonial-admin-btn-down') && (event.target.disabled == false)) {
+        this.handleReorderButton(event, 1);
     } else if (event.target.classList.contains('randomonial-admin-btn-del')) {
         this.handleDeleteButton(event);
     } else {
         return;
     }
 };
+
+RandomonialAdminController.prototype.handleReorderButton = function(event, direction = -1) {
+    jQuery.post(
+        randomonial_admin_client.ajax_url, 
+        {
+            "action"    : "randomonials",
+            "operation" : "reorder-items",
+            "wp_nonce"  : randomonial_admin_client.nonce_reorder_items,
+            "itemId"    : event.target.parentNode.parentNode.dataset.randomonialId,
+            "direction" : direction
+        }).done(response => {
+            let aResult = JSON.parse(response);
+
+            if (aResult[0] == 200) {
+                // Refresh the window for updates
+                window.location.reload(true);
+            }
+            else if (aResult[0] == 400) {
+                this.elSubmitResultBox.innerHTML = 'Error - Failed to reorder randomonial!';
+                this.elSubmitResultBox.classList.add('randomonial-show-result');
+                this.elSubmitResultBox.classList.add('randomonial-show-result-error');
+            }
+            else {
+                this.elSubmitResultBox.innerHTML = 'Error - ' + aResult[1];
+                this.elSubmitResultBox.classList.add('randomonial-show-result');
+                this.elSubmitResultBox.classList.add('randomonial-show-result-error');
+            }
+        });
+}
 
 RandomonialAdminController.prototype.initializeDataObject = function(randomonial = null) {
     if (randomonial !== null) {

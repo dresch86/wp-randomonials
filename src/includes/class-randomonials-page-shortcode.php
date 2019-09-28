@@ -1,4 +1,22 @@
 <?php
+/**********************************************************************
+Randomonials is a plugin for WordPress that manages and displays
+testimonials in a randomized order.
+Copyright (C) 2019 by Daniel Resch
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 3 of the License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+***********************************************************************/
+
 class Radomonials_Page_Shortcode {
     private $randomonial_template;
     private static $selfClosing = array('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr');
@@ -44,7 +62,7 @@ class Radomonials_Page_Shortcode {
         if ($randomonial_record_count > 0) {
             $index_map = array_keys($JSON->entries);
             
-            if ($overrideSettings['randomize'] !== false) {
+            if ($overrideSettings['randomize'] === true) {
                 shuffle($index_map);
             }
     
@@ -76,18 +94,16 @@ class Radomonials_Page_Shortcode {
         else {
             $admin_email = get_bloginfo('admin_email');
             
-            $HTML = <<<HTML 
-            <div id="randomonials-container">
-                <div id="randomonials-welcome">Your feedback is very important to us, and our future customers. Please <a href="mailto:{$admin_email}?subject=Testimonial%20Submission%20Request">contact us</a> to be the first to share your thoughts with us about our services!</div>
-            </div> 
-            HTML;
+            $HTML = '<div id="randomonials-container">' . "\n";
+            $HTML .= '    <div id="randomonials-welcome">Your feedback is very important to us, and our future customers. Please <a href="mailto:{$admin_email}?subject=Testimonial%20Submission%20Request">contact us</a> to be the first to share your thoughts with us about our services!</div>' . "\n";
+            $HTML .= '</div>' . "\n"; 
         }
 
         return $HTML;
     }
 
     public function display_randomonials($atts = []) {
-        $attrSettings = shortcode_atts(array('type'=> 'page', 'count' => '0', 'randomize' => false), $atts);
+        $attrSettings = shortcode_atts(array('type'=> 'page', 'count' => '0', 'randomize' => true), $atts);
         $testimonialJSON = RANDOMONIAL_PLUGIN_PATH . 'data/blog_id_' . get_current_blog_id() . '.json';
 
         if (file_exists($testimonialJSON)) {

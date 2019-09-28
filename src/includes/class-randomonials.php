@@ -1,17 +1,21 @@
 <?php
 /**
- * The file that defines the core plugin class
- *
- * A class definition that includes attributes and functions used across both the
- * public-facing side of the site and the admin area.
- *
- * @link       http://example.com
- * @since      1.0.0
- *
- * @package    Randomonials
- * @subpackage Randomonials/includes
- */
-/**
+ * Randomonials is a plugin for WordPress that manages and displays
+ * testimonials in a randomized order.
+ * Copyright (C) 2019 by Daniel Resch
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * 
  * The core plugin class.
  *
  * This is used to define internationalization, admin-specific hooks, and
@@ -23,7 +27,7 @@
  * @since      1.0.0
  * @package    Randomonials
  * @subpackage Randomonials/includes
- * @author     Your Name <email@example.com>
+ * @author     Daniel Resch <primesoftwarenetworks@gmail.com>
  */
 class Randomonials {
 	/**

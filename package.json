@@ -2,16 +2,13 @@
   "name": "randomonials",
   "version": "1.0.0",
   "description": "This plugin randomizes a collection of testimonials for WordPress.",
-  "main": "index.js",
-  "module": "main.js",
   "scripts": {
-    "clean": "rimraf dist/** build/**",
-    "build": "node -r esm ./scripts/build-plugin.js",
+    "clean": "rimraf build/**",
+    "plugin": "node -r esm ./scripts/build-plugin.js",
     "archive": "node -r esm ./scripts/archive-plugin.js",
-    "rebuild": "npm-run-all clean build archive"
+    "build": "npm-run-all clean plugin archive"
   },
   "dirs": {
-    "dist": "dist",
     "build": "build",
     "src": "src"
   },
@@ -20,17 +17,16 @@
     "url": "https://git.archnet.home/psnwordpress/randomonials.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "esm": "^3.2.25"
-  },
+  "author": "Daniel Resch",
+  "license": "GPLv3",
+  "dependencies": {},
   "devDependencies": {
     "@types/autoprefixer": "^9.5.0",
     "@types/node": "^12.6.8",
     "archiver": "^3.1.1",
     "autoprefixer": "^9.6.1",
     "cssnano": "^4.1.10",
+    "esm": "^3.2.25",
     "fs-extra": "^8.1.0",
     "npm-run-all": "^4.1.5",
     "postcss": "^7.0.17",

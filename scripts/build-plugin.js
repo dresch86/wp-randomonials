@@ -7,8 +7,8 @@ import * as Terser from 'terser';
 import autoprefixer from 'autoprefixer';
 
 const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf8"));
+const pthBuild = path.resolve(__dirname, '../', pkg.dirs.build, pkg.name);
 const pthSrc = path.resolve(__dirname, '../', pkg.dirs.src);
-const pthBuild = path.resolve(__dirname, '../', pkg.dirs.build);
 
 readdirp(pthSrc, {type: 'files'})
     .on('data', (entry) => {

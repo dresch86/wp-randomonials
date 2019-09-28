@@ -110,13 +110,13 @@ class Radomonials_Page_Shortcode {
             $testimonialJSON = json_decode(file_get_contents($testimonialJSON));
 
             if ($attrSettings['type'] == 'single') {
-
+                return '';
             }
             elseif ($attrSettings['type'] == 'group') {
-
+                return '';
             }
             elseif ($attrSettings['type'] == 'rotator') {
-
+                return '';
             }
             else {
                 return $this->get_page_randomonials($testimonialJSON, $overrideSettings['count'], $overrideSettings['randomize']);

@@ -62,7 +62,7 @@ class Radomonials_Page_Shortcode {
         if ($randomonial_record_count > 0) {
             $index_map = array_keys($JSON->entries);
             
-            if ($overrideSettings['randomize'] === true) {
+            if ($randomize === true) {
                 shuffle($index_map);
             }
     
@@ -119,7 +119,7 @@ class Radomonials_Page_Shortcode {
                 return '';
             }
             else {
-                return $this->get_page_randomonials($testimonialJSON, $overrideSettings['count'], $overrideSettings['randomize']);
+                return $this->get_page_randomonials($testimonialJSON, $attrSettings['count'], $attrSettings['randomize']);
             }
         }
         else {

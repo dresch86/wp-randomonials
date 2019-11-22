@@ -67,7 +67,7 @@ class Radomonials_Page_Shortcode {
             }
     
             // Sets $randomonial_template using NOWDOC
-            require_once RANDOMONIAL_PLUGIN_PATH . 'public/partials/randomonial_page.php';
+            require RANDOMONIAL_PLUGIN_PATH . 'public/partials/randomonial_page.php';
             $randomonial_template = json_decode($randomonial_template);
             $HTML = '<div id="randomonials-container">' . "\n";
     

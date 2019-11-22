@@ -75,7 +75,7 @@ class Randomonials_Admin {
 
 	private function validate_randomonial($dataStringified) {
 		// Sets $randomonial_template using NOWDOC
-		require_once RANDOMONIAL_PLUGIN_PATH . 'public/partials/randomonial_page.php';
+		require RANDOMONIAL_PLUGIN_PATH . 'public/partials/randomonial_page.php';
 		$randomonial_template = json_decode($randomonial_template);
 
 		$dataInbound = json_decode(html_entity_decode(stripslashes($dataStringified)));
@@ -321,7 +321,7 @@ class Randomonials_Admin {
 
 	private function build_randomonials_data_form() {
         // Sets $randomonial_template using NOWDOC
-        require_once RANDOMONIAL_PLUGIN_PATH . 'public/partials/randomonial_page.php';
+        require RANDOMONIAL_PLUGIN_PATH . 'public/partials/randomonial_page.php';
 		$randomonial_template = json_decode($randomonial_template);
 		
 		$custom_fields = array_keys(get_object_vars($randomonial_template->fields->custom));
@@ -363,7 +363,7 @@ class Randomonials_Admin {
 		}
 
 		// Sets $randomonial_data_form using HEREDOC
-		require_once RANDOMONIAL_PLUGIN_PATH . 'admin/partials/randomonial-data-form.php';
+		require RANDOMONIAL_PLUGIN_PATH . 'admin/partials/randomonial-data-form.php';
 		return $randomonial_data_form;
 	}
 
@@ -436,7 +436,7 @@ class Randomonials_Admin {
 				$randomonial_controls = $this->build_randomonial_html_rows($randomonial_count, $testimonialJSON);
 
 				// Sets $randomonials_control_grid var using HEREDOC
-				require_once RANDOMONIAL_PLUGIN_PATH . 'admin/partials/randomonials-control-grid.php';
+				require RANDOMONIAL_PLUGIN_PATH . 'admin/partials/randomonials-control-grid.php';
 				$dashboard_output = &$randomonials_control_grid;
 			}
 			else {
@@ -449,7 +449,7 @@ class Randomonials_Admin {
 		}
 
 		// Sets $randomonials_dashboard var using HEREDOC
-		require_once RANDOMONIAL_PLUGIN_PATH . 'admin/partials/randomonials-dashboard.php';
+		require RANDOMONIAL_PLUGIN_PATH . 'admin/partials/randomonials-dashboard.php';
 		echo $randomonials_dashboard;		
 		echo $this->build_randomonials_data_form();
 	}

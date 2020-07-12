@@ -62,7 +62,7 @@ class Radomonials_Page_Shortcode {
         if ($randomonial_record_count > 0) {
             $index_map = array_keys($JSON->entries);
             
-            if ($randomize === true) {
+            if (($randomize === true) || filter_var($randomize, FILTER_VALIDATE_BOOLEAN)) {
                 shuffle($index_map);
             }
     

@@ -27,19 +27,21 @@ Testimonials are displayed in randomized order by default. That means on each pa
 ## __Build Instructions__
 ### Requirements:
 * NodeJS
-* npm-run-all (global)
+* nps (global)
+* nps-utils (global)
+* _Optional: PNPM_
 
 ### Tasks:
-* Build and package - _npm-run-all build_
-* Build plugin only - _npm-run-all plugin_
-* Archive current build - _npm-run-all archive_
+* Build and package - _nps build_
+* Build plugin only - _nps plugin_
+* Archive current build - _nps archive_
 
 ### Build Steps:
 1. Git clone `https://github.com/dresch86/wp-randomonials`
 1. `cd` into cloned directory
-1. `npm install`
-1. `npm-run-all build`
-1. Upload zip file in the build directory to WordPress
+1. `(p)npm install`
+1. `nps build`
+1. Install zip file in the build directory using the WordPress plugin manager
 
 ### __Future Goals:__
 - [ ] Document all functions
@@ -47,3 +49,4 @@ Testimonials are displayed in randomized order by default. That means on each pa
 - [ ] Functionality for rotating testimonials
 - [ ] Make template editable in the admin panel
 - [ ] Use a JS table renderer to sync testimonials with JSON instead of refreshing page
+- [ ] Test on Wordpress 5.2.4
